@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Slama EN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 550px;
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #38bdf8;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 8px;
+    background: #0f172a;
+    color: white;
+    font-size: 15px;
+  }
+
+  button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .task-box, .score-box, .leaderboard, .saved-words, .chat-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #0f172a;
+    border-radius: 10px;
+    display: none;
+  }
+
+  .word-item, .player-item, .chat-message {
+    padding: 8px;
+    background: #1e293b;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  #logoutBtn {
+    background: #f87171;
+    color: white;
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>Slama EN</h1>
+
+  <!-- LOGIN SECTION -->
+  <div id="loginSection">
+    <label>اسم المستخدم:</label>
+    <input id="usernameInput" type="text" placeholder="اكتب اسمك...">
+
+    <label>كلمة المرور:</label>
+    <input id="passwordInput" type="password" placeholder="••••••">
+
+    <button id="loginBtn">دخول</button>
+    <button id="registerBtn" style="background:#4ade80; color:#0f172a;">إنشاء حساب جديد</button>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="appSection" style="display:none;">
+    <h2 id="welcomeUser"></h2>
+    <p id="userLevel"></p>
+    <p id="userPoints"></p>
+
+    <button id="logoutBtn">تسجيل خروج</button>
+
+    <hr style="margin:20px 0; border-color:#334155">
+    <!-- WORD INPUT + TASK -->
+    <label>اكتب كلمة إنجليزية:</label>
+    <input id="wordInput" type="text" placeholder="مثال: improve, focus, challenge">
+    <button id="generateBtn">✨ Generate Task</button>
+
+    <div class="task-box" id="taskSection">
+      <h3>Mini Task</h3>
+      <p id="taskInstruction"></p>
+
+      <button id="speakBtn">🔊 نطق الكلمة</button>
+
+      <textarea id="sentenceInput" rows="4" placeholder="اكتب جملة باستخدام الكلمة..."></textarea>
+
+      <button id="checkBtn">✔ Check Sentence</button>
+    </div>
+
+    <div class="score-box" id="scoreBox"></div>
+
+    <div class="saved-words" id="savedWordsBox">
+      <h3>📘 الكلمات التي تعلمتها</h3>
+      <div id="savedWordsList"></div>
+    </div>
+
+    <div class="leaderboard" id="leaderboardBox">
+      <h3>🏆 لوحة المتصدرين</h3>
+      <div id="leaderboardList"></div>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+      <h3>💬 الشات العام</h3>
+
+      <div id="chatMessages" style="
+        max-height:200px;
+        overflow-y:auto;
+        margin-bottom:10px;
+      "></div>
+
+      <input id="chatInput" type="text" placeholder="اكتب رسالة...">
+      <button id="sendChatBtn">إرسال</button>
+    </div>
+
+  </div> <!-- END APP SECTION -->
+</div> <!-- END CONTAINER -->
+
+
+<script>
+
+/* -----------------------------
+   LOAD & SAVE USERS
+----------------------------- */
+let currentUser = null;
+
+function loadUsers() {
+  return JSON.parse(localStorage.getItem("slama_users") || "{}");
+}
+
+function saveUsers(users) {
+  localStorage.setItem("slama_users", JSON.stringify(users));
+}
+
+/* -----------------------------
+   LOGIN SYSTEM
+----------------------------- */
+document.getElementById("loginBtn").onclick = () => {
+  const username = document.getElementById("usernameInput").value.trim();
+  const password = document.getElementById("passwordInput").value.trim();
+
+  if (!username || !password) return alert("املأ جميع الحقول");
+
+  let users = loadUsers();
+
+  if (!users[username]) {
+    return alert("الحساب غير موجود — استخدم زر إنشاء حساب");
+  }
+
+  if (users[username].password !== password) {
+    return alert("كلمة المرور غير صحيحة");
+  }
+
+  currentUser = username;
+  openApp();
+};
+
+document.getElementById("registerBtn").onclick = () => {
+  const username = document.getElementById("usernameInput").value.trim();
+  const password = document.getElementById("passwordInput").value.trim();
+
+  if (!username || !password) return alert("املأ جميع الحقول");
+
+  let users = loadUsers();
+
+  if (users[username]) {
+    return alert("الاسم مستخدم مسبقاً");
+  }
+
+  users[username] = {
+    password,
+    points: 0,
+    level: 1,
+    words: [],
+    messages: []
+  };
+
+  saveUsers(users);
+
+  alert("تم إنشاء الحساب بنجاح — يمكنك تسجيل الدخول الآن");
+};
+
+function openApp() {
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("appSection").style.display = "block";
+
+  updateUserUI();
+  loadSavedWords();
+  loadLeaderboard();
+  loadChat();
+}
+
+document.getElementById("logoutBtn").onclick = () => {
+  currentUser = null;
+  document.getElementById("appSection").style.display = "none";
+  document.getElementById("loginSection").style.display = "block";
+};
+
+/* -----------------------------
+   UPDATE USER UI
+----------------------------- */
+function updateUserUI() {
+  const users = loadUsers();
+  const user = users[currentUser];
+
+  document.getElementById("welcomeUser").textContent = "مرحباً، " + currentUser;
+  document.getElementById("userLevel").textContent = "المستوى: " + user.level;
+  document.getElementById("userPoints").textContent = "النقاط: " + user.points;
+}
+
+/* -----------------------------
+   LEVEL SYSTEM
+----------------------------- */
+function updateLevel() {
+  const users = loadUsers();
+  const user = users[currentUser];
+
+  const p = user.points;
+
+  if (p >= 400) user.level = 5;
+  else if (p >= 250) user.level = 4;
+  else if (p >= 120) user.level = 3;
+  else if (p >= 50) user.level = 2;
+  else user.level = 1;
+
+  saveUsers(users);
+  updateUserUI();
+}
+
+/* -----------------------------
+   MINI TASK SYSTEM
+----------------------------- */
+const patterns = [
+  "اكتب جملة من حياتك اليومية تستخدم فيها الكلمة:",
+  "اكتب جملة توضّح معنى الكلمة:",
+  "اكتب جملة فيها الكلمة كفعل أو صفة:",
+  "اكتب جملة كأنك تشرح الكلمة لصديق:",
+  "اكتب جملة تستخدم فيها الكلمة في سياق العمل أو الدراسة:"
+];
+
+document.getElementById("generateBtn").onclick = () => {
+  const word = document.getElementById("wordInput").value.trim();
+  if (!word) return alert("اكتب كلمة أولاً");
+
+  document.getElementById("taskInstruction").textContent =
+    patterns[Math.floor(Math.random() * patterns.length)] + " (" + word + ")";
+
+  document.getElementById("taskSection").style.display = "block";
+  document.getElementById("scoreBox").style.display = "none";
+  document.getElementById("sentenceInput").value = "";
+};
+
+/* -----------------------------
+   SPEAK WORD
+----------------------------- */
+document.getElementById("speakBtn").onclick = () => {
+  const word = document.getElementById("wordInput").value.trim();
+  if (!word) return;
+
+  const utter = new SpeechSynthesisUtterance(word);
+  utter.lang = "en-US";
+  utter.rate = 0.95;
+  speechSynthesis.speak(utter);
+};
+
+/* -----------------------------
+   EVALUATE SENTENCE
+----------------------------- */
+document.getElementById("checkBtn").onclick = () => {
+  const word = document.getElementById("wordInput").value.trim().toLowerCase();
+  const sentence = document.getElementById("sentenceInput").value.trim();
+
+  if (!sentence) return alert("اكتب جملة أولاً");
+
+  let score = 0;
+
+  if (sentence.toLowerCase().includes(word)) score += 4;
+  if (sentence.split(" ").length >= 5) score += 3;
+  if (/^[A-Z]/.test(sentence)) score += 2;
+  if (sentence.endsWith(".")) score += 1;
+
+  if (score > 10) score = 10;
+
+  document.getElementById("scoreBox").textContent = `Score: ${score}/10`;
+  document.getElementById("scoreBox").style.display = "block";
+
+  saveWord(word, score);
+  loadSavedWords();
+  loadLeaderboard();
+};
+
+/* -----------------------------
+   SAVE WORD + POINTS
+----------------------------- */
+function saveWord(word, score) {
+  let users = loadUsers();
+  let user = users[currentUser];
+
+  const existing = user.words.find(w => w.word === word);
+
+  if (existing) {
+    existing.score = score;
+  } else {
+    user.words.push({ word, score });
+  }
+
+  user.points += score;
+
+  saveUsers(users);
+  updateLevel();
+}
+
+/* -----------------------------
+   SHOW SAVED WORDS
+----------------------------- */
+function loadSavedWords() {
+  const users = loadUsers();
+  const user = users[currentUser];
+
+  const box = document.getElementById("savedWordsList");
+  box.innerHTML = "";
+
+  user.words.forEach(w => {
+    box.innerHTML += `
+      <div class="word-item">
+        <b>${w.word}</b> — Score: ${w.score}/10
+      </div>
+    `;
+  });
+
+  document.getElementById("savedWordsBox").style.display = "block";
+}
+/* -----------------------------
+   LEADERBOARD
+----------------------------- */
+function loadLeaderboard() {
+  const users = loadUsers();
+  const list = Object.entries(users)
+    .map(([name, data]) => ({ name, points: data.points, level: data.level }))
+    .sort((a, b) => b.points - a.points);
+
+  const box = document.getElementById("leaderboardList");
+  box.innerHTML = "";
+
+  list.forEach((p, i) => {
+    box.innerHTML += `
+      <div class="player-item">
+        #${i+1} — <b>${p.name}</b> | Level ${p.level} | ${p.points} pts
+      </div>
+    `;
+  });
+
+  document.getElementById("leaderboardBox").style.display = "block";
+}
+
+/* -----------------------------
+   GLOBAL CHAT SYSTEM
+----------------------------- */
+function loadChat() {
+  const users = loadUsers();
+  const allMessages = [];
+
+  // جمع كل الرسائل من كل اللاعبين
+  for (let name in users) {
+    if (users[name].messages) {
+      users[name].messages.forEach(msg => {
+        allMessages.push(msg);
+      });
+    }
+  }
+
+  // ترتيب الرسائل حسب الوقت
+  allMessages.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+  const chatBox = document.getElementById("chatMessages");
+  chatBox.innerHTML = "";
+
+  allMessages.forEach(msg => {
+    chatBox.innerHTML += `
+      <div class="chat-message">
+        <b>${msg.from}:</b> ${msg.text}
+        <div style="font-size:11px; opacity:0.6;">${msg.time}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("chatBox").style.display = "block";
+
+  // ينزل لآخر الرسائل
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.getElementById("sendChatBtn").onclick = () => {
+  const text = document.getElementById("chatInput").value.trim();
+  if (!text) return;
+
+  const users = loadUsers();
+  const user = users[currentUser];
+
+  const msg = {
+    from: currentUser,
+    text,
+    time: new Date().toLocaleString()
+  };
+
+  // حفظ الرسالة في حساب المستخدم
+  if (!user.messages) user.messages = [];
+  user.messages.push(msg);
+
+  saveUsers(users);
+
+  document.getElementById("chatInput").value = "";
+  loadChat();
+};
+
+// تحديث الشات كل 3 ثواني
+setInterval(() => {
+  if (currentUser) loadChat();
+}, 3000);
+
+</script>
+
+</body>
+</html>

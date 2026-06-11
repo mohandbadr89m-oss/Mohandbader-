@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>موقع توقعات البطولة - 16 فريق</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #111827, #020617);
+      color: #e5e7eb;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #9ca3af;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .bracket-container {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .round {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+    }
+
+    .round-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    .match {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+    }
+
+    .match-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .team-btn {
+      width: 100%;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.15s ease-out;
+    }
+
+    .team-btn:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .team-btn.selected {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: #22c55e;
+      color: #022c22;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
+      font-weight: 600;
+    }
+
+    .slot {
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 999px;
+      border: 1px dashed rgba(75, 85, 99, 0.9);
+      background: rgba(15, 23, 42, 0.7);
+      font-size: 13px;
+      text-align: center;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .slot.filled {
+      border-style: solid;
+      border-color: #38bdf8;
+      color: #e5e7eb;
+    }
+
+    .champion {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(250, 204, 21, 0.7);
+      background: radial-gradient(circle at top, #facc15, #92400e);
+      color: #111827;
+      text-align: center;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.8);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s ease-out;
+    }
+
+    .control-btn:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 900px) {
+      .bracket-container {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .bracket-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>توقعات بطولة - 16 فريق</h1>
+  <div class="subtitle">اختر الفائز من كل مباراة وشوف كيف يتأهل تلقائيًا للأدوار التالية</div>
+
+  <div class="controls">
+    <button class="control-btn" id="btnRandom">تعبئة عشوائية</button>
+    <button class="control-btn" id="btnReset">إعادة التعيين</button>
+  </div>
+
+  <div class="bracket-container">
+    <!-- دور 16 -->
+    <div class="round" id="round16">
+      <div class="round-title">دور 16</div>
+      <div id="matches16"></div>
+    </div>
+
+    <!-- ربع النهائي -->
+    <div class="round">
+      <div class="round-title">ربع النهائي</div>
+      <div id="qfSlots"></div>
+    </div>
+
+    <!-- نصف النهائي -->
+    <div class="round">
+      <div class="round-title">نصف النهائي</div>
+      <div id="sfSlots"></div>
+    </div>
+
+    <!-- النهائي -->
+    <div class="round">
+      <div class="round-title">النهائي</div>
+      <div id="finalSlots"></div>
+      <div id="championBox" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // أسماء الفرق (تقدر تعدلها على كيفك)
+    const teams = [
+      "الفريق 1", "الفريق 2",
+      "الفريق 3", "الفريق 4",
+      "الفريق 5", "الفريق 6",
+      "الفريق 7", "الفريق 8",
+      "الفريق 9", "الفريق 10",
+      "الفريق 11", "الفريق 12",
+      "الفريق 13", "الفريق 14",
+      "الفريق 15", "الفريق 16"
+    ];
+
+    const matches16Container = document.getElementById("matches16");
+    const qfSlotsContainer = document.getElementById("qfSlots");
+    const sfSlotsContainer = document.getElementById("sfSlots");
+    const finalSlotsContainer = document.getElementById("finalSlots");
+    const championBox = document.getElementById("championBox");
+
+    const state = {
+      r16: Array(8).fill(null),
+      qf: Array(4).fill(null),
+      sf: Array(2).fill(null),
+      final: Array(1).fill(null),
+      champion: null
+    };
+
+    function createMatch(round, index, teamA, teamB) {
+      const matchDiv = document.createElement("div");
+      matchDiv.className = "match";
+
+      const label = document.createElement("div");
+      label.className = "match-label";
+      label.textContent = `${round} - مباراة ${index + 1}`;
+      matchDiv.appendChild(label);
+
+      const btnA = document.createElement("button");
+      btnA.className = "team-btn";
+      btnA.textContent = teamA;
+
+      const btnB = document.createElement("button");
+      btnB.className = "team-btn";
+      btnB.textContent = teamB;
+
+      btnA.addEventListener("click", () => selectWinner(round, index, teamA, btnA, btnB));
+      btnB.addEventListener("click", () => selectWinner(round, index, teamB, btnB, btnA));
+
+      matchDiv.appendChild(btnA);
+      matchDiv.appendChild(btnB);
+
+      return matchDiv;
+    }
+
+    function createSlot(round, index) {
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.dataset.round = round;
+      slot.dataset.index = index;
+      slot.textContent = "بانتظار المتأهل...";
+      return slot;
+    }
+
+    function renderInitial() {
+      // دور 16
+      for (let i = 0; i < 8; i++) {
+        const teamA = teams[i * 2];
+        const teamB = teams[i * 2 + 1];
+        const match = createMatch("دور 16", i, teamA, teamB);
+        matches16Container.appendChild(match);
+      }
+
+      // ربع النهائي: 4 مباريات = 8 خانات (كل خانة متأهل من مباراة)
+      for (let i = 0; i < 4; i++) {
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "match";
+
+        const label = document.createElement("div");
+        label.className = "match-label";
+        label.textContent = `ربع النهائي - مباراة ${i + 1}`;
+        matchDiv.appendChild(label);
+
+        const slot1 = createSlot("qf", i * 2);
+        const slot2 = createSlot("qf", i * 2 + 1);
+
+        matchDiv.appendChild(slot1);
+        matchDiv.appendChild(slot2);
+
+        const btn1 = document.createElement("button");
+        btn1.className = "team-btn";
+        btn1.textContent = "اختر متأهل 1";
+        const btn2 = document.createElement("button");
+        btn2.className = "team-btn";
+        btn2.textContent = "اختر متأهل 2";
+
+        btn1.addEventListener("click", () => selectFromSlots("qf", i, 0));
+        btn2.addEventListener("click", () => selectFromSlots("qf", i, 1));
+
+        matchDiv.appendChild(btn1);
+        matchDiv.appendChild(btn2);
+
+        qfSlotsContainer.appendChild(matchDiv);
+      }
+
+      // نصف النهائي: 2 مباريات
+      for (let i = 0; i < 2; i++) {
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "match";
+
+        const label = document.createElement("div");
+        label.className = "match-label";
+        label.textContent = `نصف النهائي - مباراة ${i + 1}`;
+        matchDiv.appendChild(label);
+
+        const slot1 = createSlot("sf", i * 2);
+        const slot2 = createSlot("sf", i * 2 + 1);
+
+        matchDiv.appendChild(slot1);
+        matchDiv.appendChild(slot2);
+
+        const btn1 = document.createElement("button");
+        btn1.className = "team-btn";
+        btn1.textContent = "اختر متأهل 1";
+        const btn2 = document.createElement("button");
+        btn2.className = "team-btn";
+        btn2.textContent = "اختر متأهل 2";
+
+        btn1.addEventListener("click", () => selectFromSlots("sf", i, 0));
+        btn2.addEventListener("click", () => selectFromSlots("sf", i, 1));
+
+        matchDiv.appendChild(btn1);
+        matchDiv.appendChild(btn2);
+
+        sfSlotsContainer.appendChild(matchDiv);
+      }
+
+      // النهائي
+      const finalMatch = document.createElement("div");
+      finalMatch.className = "match";
+
+      const label = document.createElement("div");
+      label.className = "match-label";
+      label.textContent = "النهائي";
+      finalMatch.appendChild(label);
+
+      const slot1 = createSlot("final", 0);
+      const slot2 = createSlot("final", 1);
+
+      finalMatch.appendChild(slot1);
+      finalMatch.appendChild(slot2);
+
+      const btn1 = document.createElement("button");
+      btn1.className = "team-btn";
+      btn1.textContent = "اختر بطل 1";
+      const btn2 = document.createElement("button");
+      btn2.className = "team-btn";
+      btn2.textContent = "اختر بطل 2";
+
+      btn1.addEventListener("click", () => selectFromSlots("final", 0, 0));
+      btn2.addEventListener("click", () => selectFromSlots("final", 0, 1));
+
+      finalMatch.appendChild(btn1);
+      finalMatch.appendChild(btn2);
+
+      finalSlotsContainer.appendChild(finalMatch);
+    }
+
+    function selectWinner(round, matchIndex, teamName, btnSelected, btnOther) {
+      // تمييز الزر المختار
+      const parent = btnSelected.parentElement;
+      parent.querySelectorAll(".team-btn").forEach(btn => btn.classList.remove("selected"));
+      btnSelected.classList.add("selected");
+
+      if (round === "دور 16") {
+        state.r16[matchIndex] = teamName;
+        updateNextRoundFromR16();
+      }
+    }
+
+    function updateNextRoundFromR16() {
+      const qfSlots = qfSlotsContainer.querySelectorAll(".slot[data-round='qf']");
+      for (let i = 0; i < 8; i++) {
+        const fromMatch = state.r16[i];
+        if (fromMatch) {
+          const slotIndex = i;
+          const slot = qfSlots[slotIndex];
+          slot.textContent = fromMatch;
+          slot.classList.add("filled");
+        }
+      }
+    }
+
+    function updateNextRoundFromQF() {
+      const sfSlots = sfSlotsContainer.querySelectorAll(".slot[data-round='sf']");
+      for (let i = 0; i < 4; i++) {
+        const fromMatch = state.qf[i];
+        if (fromMatch) {
+          const slotIndex = i;
+          const slot = sfSlots[slotIndex];
+          slot.textContent = fromMatch;
+          slot.classList.add("filled");
+        }
+      }
+    }
+
+    function updateNextRoundFromSF() {
+      const finalSlots = finalSlotsContainer.querySelectorAll(".slot[data-round='final']");
+      for (let i = 0; i < 2; i++) {
+        const fromMatch = state.sf[i];
+        if (fromMatch) {
+          const slotIndex = i;
+          const slot = finalSlots[slotIndex];
+          slot.textContent = fromMatch;
+          slot.classList.add("filled");
+        }
+      }
+    }
+
+    function selectFromSlots(roundKey, matchIndex, which) {
+      let slotsNodeList;
+      let stateArray;
+      let updateNext;
+
+      if (roundKey === "qf") {
+        slotsNodeList = qfSlotsContainer.querySelectorAll(".slot[data-round='qf']");
+        stateArray = state.qf;
+        updateNext = updateNextRoundFromQF;
+      } else if (roundKey === "sf") {
+        slotsNodeList = sfSlotsContainer.querySelectorAll(".slot[data-round='sf']");
+        stateArray = state.sf;
+        updateNext = updateNextRoundFromSF;
+      } else if (roundKey === "final") {
+        slotsNodeList = finalSlotsContainer.querySelectorAll(".slot[data-round='final']");
+        stateArray = state.final;
+        updateNext = () => {
+          state.champion = state.final[0] || state.final[1] || null;
+          renderChampion();
+        };
+      }
+
+      const baseIndex = matchIndex * 2;
+      const slot = slotsNodeList[baseIndex + which];
+      const name = slot.textContent.trim();
+
+      if (!name || name === "بانتظار المتأهل...") {
+        alert("لسه ما تحدد المتأهل في هذه الخانة.");
+        return;
+      }
+
+      stateArray[matchIndex] = name;
+      updateNext();
+    }
+
+    function renderChampion() {
+      championBox.innerHTML = "";
+      if (!state.champion) return;
+      const div = document.createElement("div");
+      div.className = "champion";
+      div.textContent = `🏆 البطل حسب توقعك: ${state.champion}`;
+      championBox.appendChild(div);
+    }
+
+    function resetAll() {
+      state.r16.fill(null);
+      state.qf.fill(null);
+      state.sf.fill(null);
+      state.final.fill(null);
+      state.champion = null;
+
+      document.querySelectorAll(".team-btn").forEach(btn => btn.classList.remove("selected"));
+      document.querySelectorAll(".slot").forEach(slot => {
+        slot.textContent = "بانتظار المتأهل...";
+        slot.classList.remove("filled");
+      });
+      championBox.innerHTML = "";
+    }
+
+    function randomFill() {
+      resetAll();
+      // دور 16 عشوائي
+      for (let i = 0; i < 8; i++) {
+        const matchDiv = matches16Container.children[i];
+        const buttons = matchDiv.querySelectorAll(".team-btn");
+        const randomIndex = Math.random() < 0.5 ? 0 : 1;
+        buttons[randomIndex].click();
+      }
+
+      // ربع النهائي عشوائي
+      for (let i = 0; i < 4; i++) {
+        const matchDiv = qfSlotsContainer.children[i];
+        const buttons = matchDiv.querySelectorAll(".team-btn");
+        const randomIndex = Math.random() < 0.5 ? 0 : 1;
+        buttons[randomIndex].click();
+      }
+
+      // نصف النهائي عشوائي
+      for (let i = 0; i < 2; i++) {
+        const matchDiv = sfSlotsContainer.children[i];
+        const buttons = matchDiv.querySelectorAll(".team-btn");
+        const randomIndex = Math.random() < 0.5 ? 0 : 1;
+        buttons[randomIndex].click();
+      }
+
+      // النهائي عشوائي
+      const finalMatch = finalSlotsContainer.children[0];
+      const buttons = finalMatch.querySelectorAll(".team-btn");
+      const randomIndex = Math.random() < 0.5 ? 0 : 1;
+      buttons[randomIndex].click();
+    }
+
+    document.getElementById("btnReset").addEventListener("click", resetAll);
+    document.getElementById("btnRandom").addEventListener("click", randomFill);
+
+    renderInitial();
+  </script>
+</body>
+</html>
