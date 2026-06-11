@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>موقع توقعات البطولة - 16 فريق</title>
+  <title>توقعات البطولة - 16 فريق</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -23,13 +24,13 @@
     }
 
     h1 {
-      font-size: 26px;
+      font-size: 28px;
       text-align: center;
       margin-bottom: 4px;
     }
 
     .subtitle {
-      font-size: 14px;
+      font-size: 15px;
       color: #9ca3af;
       text-align: center;
       margin-bottom: 10px;
@@ -37,22 +38,53 @@
 
     .bracket-container {
       display: grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
       gap: 16px;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1300px;
+      padding: 10px;
+    }
+
+    @media (max-width: 1000px) {
+      .bracket-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .bracket-container {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      .team-btn,
+      .slot {
+        font-size: 15px;
+        padding: 12px;
+      }
+
+      .match {
+        margin-bottom: 18px;
+      }
     }
 
     .round {
       background: rgba(15, 23, 42, 0.9);
       border-radius: 14px;
-      padding: 10px;
+      padding: 14px;
       border: 1px solid rgba(148, 163, 184, 0.3);
       box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
     }
 
     .round-title {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: #e5e7eb;
       margin-bottom: 10px;
@@ -63,13 +95,13 @@
     .match {
       background: rgba(15, 23, 42, 0.9);
       border-radius: 10px;
-      padding: 8px;
-      margin-bottom: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
       border: 1px solid rgba(55, 65, 81, 0.7);
     }
 
     .match-label {
-      font-size: 11px;
+      font-size: 12px;
       color: #9ca3af;
       margin-bottom: 6px;
       text-align: center;
@@ -77,16 +109,17 @@
 
     .team-btn {
       width: 100%;
-      padding: 6px 8px;
-      margin-bottom: 4px;
+      padding: 10px;
+      margin-bottom: 6px;
       border-radius: 999px;
       border: 1px solid rgba(75, 85, 99, 0.9);
       background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
       text-align: center;
       transition: 0.15s ease-out;
+      touch-action: manipulation;
     }
 
     .team-btn:hover {
@@ -105,14 +138,14 @@
 
     .slot {
       width: 100%;
-      padding: 7px 8px;
+      padding: 10px;
       border-radius: 999px;
       border: 1px dashed rgba(75, 85, 99, 0.9);
       background: rgba(15, 23, 42, 0.7);
-      font-size: 13px;
+      font-size: 14px;
       text-align: center;
       color: #9ca3af;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .slot.filled {
@@ -123,7 +156,7 @@
 
     .champion {
       margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
       border-radius: 12px;
       border: 1px solid rgba(250, 204, 21, 0.7);
       background: radial-gradient(circle at top, #facc15, #92400e);
@@ -142,14 +175,15 @@
     }
 
     .control-btn {
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.7);
       background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
       transition: 0.15s ease-out;
+      touch-action: manipulation;
     }
 
     .control-btn:hover {
@@ -157,23 +191,13 @@
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
       transform: translateY(-1px);
     }
-
-    @media (max-width: 900px) {
-      .bracket-container {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-      }
-    }
-
-    @media (max-width: 600px) {
-      .bracket-container {
-        grid-template-columns: 1fr;
-      }
-    }
   </style>
 </head>
+
 <body>
+
   <h1>توقعات بطولة - 16 فريق</h1>
-  <div class="subtitle">اختر الفائز من كل مباراة وشوف كيف يتأهل تلقائيًا للأدوار التالية</div>
+  <div class="subtitle">اختر الفائز من كل مباراة وشاهد كيف يتأهل تلقائيًا للأدوار التالية</div>
 
   <div class="controls">
     <button class="control-btn" id="btnRandom">تعبئة عشوائية</button>
@@ -181,34 +205,29 @@
   </div>
 
   <div class="bracket-container">
-    <!-- دور 16 -->
-    <div class="round" id="round16">
+    <div class="round">
       <div class="round-title">دور 16</div>
       <div id="matches16"></div>
     </div>
 
-    <!-- ربع النهائي -->
     <div class="round">
       <div class="round-title">ربع النهائي</div>
       <div id="qfSlots"></div>
     </div>
 
-    <!-- نصف النهائي -->
     <div class="round">
       <div class="round-title">نصف النهائي</div>
       <div id="sfSlots"></div>
     </div>
 
-    <!-- النهائي -->
     <div class="round">
       <div class="round-title">النهائي</div>
       <div id="finalSlots"></div>
-      <div id="championBox" style="margin-top:8px;"></div>
+      <div id="championBox"></div>
     </div>
   </div>
 
   <script>
-    // أسماء الفرق (تقدر تعدلها على كيفك)
     const teams = [
       "الفريق 1", "الفريق 2",
       "الفريق 3", "الفريق 4",
@@ -217,7 +236,7 @@
       "الفريق 9", "الفريق 10",
       "الفريق 11", "الفريق 12",
       "الفريق 13", "الفريق 14",
-      "الفريق 15", "الف 16"
+      "الفريق 15", "الفريق 16"
     ];
 
     const matches16Container = document.getElementById("matches16");
@@ -274,11 +293,10 @@
       for (let i = 0; i < 8; i++) {
         const teamA = teams[i * 2];
         const teamB = teams[i * 2 + 1];
-        const match = createMatch("دور 16", i, teamA, teamB);
-        matches16Container.appendChild(match);
+        matches16Container.appendChild(createMatch("دور 16", i, teamA, teamB));
       }
 
-      // ربع النهائي: 4 مباريات = 8 خانات (كل خانة متأهل من مباراة)
+      // ربع النهائي
       for (let i = 0; i < 4; i++) {
         const matchDiv = document.createElement("div");
         matchDiv.className = "match";
@@ -288,15 +306,13 @@
         label.textContent = `ربع النهائي - مباراة ${i + 1}`;
         matchDiv.appendChild(label);
 
-        const slot1 = createSlot("qf", i * 2);
-        const slot2 = createSlot("qf", i * 2 + 1);
-
-        matchDiv.appendChild(slot1);
-        matchDiv.appendChild(slot2);
+        matchDiv.appendChild(createSlot("qf", i * 2));
+        matchDiv.appendChild(createSlot("qf", i * 2 + 1));
 
         const btn1 = document.createElement("button");
         btn1.className = "team-btn";
         btn1.textContent = "اختر متأهل 1";
+
         const btn2 = document.createElement("button");
         btn2.className = "team-btn";
         btn2.textContent = "اختر متأهل 2";
@@ -310,7 +326,7 @@
         qfSlotsContainer.appendChild(matchDiv);
       }
 
-      // نصف النهائي: 2 مباريات
+      // نصف النهائي
       for (let i = 0; i < 2; i++) {
         const matchDiv = document.createElement("div");
         matchDiv.className = "match";
@@ -320,15 +336,13 @@
         label.textContent = `نصف النهائي - مباراة ${i + 1}`;
         matchDiv.appendChild(label);
 
-        const slot1 = createSlot("sf", i * 2);
-        const slot2 = createSlot("sf", i * 2 + 1);
-
-        matchDiv.appendChild(slot1);
-        matchDiv.appendChild(slot2);
+        matchDiv.appendChild(createSlot("sf", i * 2));
+        matchDiv.appendChild(createSlot("sf", i * 2 + 1));
 
         const btn1 = document.createElement("button");
         btn1.className = "team-btn";
         btn1.textContent = "اختر متأهل 1";
+
         const btn2 = document.createElement("button");
         btn2.className = "team-btn";
         btn2.textContent = "اختر متأهل 2";
@@ -351,15 +365,13 @@
       label.textContent = "النهائي";
       finalMatch.appendChild(label);
 
-      const slot1 = createSlot("final", 0);
-      const slot2 = createSlot("final", 1);
-
-      finalMatch.appendChild(slot1);
-      finalMatch.appendChild(slot2);
+      finalMatch.appendChild(createSlot("final", 0));
+      finalMatch.appendChild(createSlot("final", 1));
 
       const btn1 = document.createElement("button");
       btn1.className = "team-btn";
       btn1.textContent = "اختر بطل 1";
+
       const btn2 = document.createElement("button");
       btn2.className = "team-btn";
       btn2.textContent = "اختر بطل 2";
@@ -374,9 +386,7 @@
     }
 
     function selectWinner(round, matchIndex, teamName, btnSelected, btnOther) {
-      // تمييز الزر المختار
-      const parent = btnSelected.parentElement;
-      parent.querySelectorAll(".team-btn").forEach(btn => btn.classList.remove("selected"));
+      btnSelected.parentElement.querySelectorAll(".team-btn").forEach(btn => btn.classList.remove("selected"));
       btnSelected.classList.add("selected");
 
       if (round === "دور 16") {
@@ -388,12 +398,9 @@
     function updateNextRoundFromR16() {
       const qfSlots = qfSlotsContainer.querySelectorAll(".slot[data-round='qf']");
       for (let i = 0; i < 8; i++) {
-        const fromMatch = state.r16[i];
-        if (fromMatch) {
-          const slotIndex = i;
-          const slot = qfSlots[slotIndex];
-          slot.textContent = fromMatch;
-          slot.classList.add("filled");
+        if (state.r16[i]) {
+          qfSlots[i].textContent = state.r16[i];
+          qfSlots[i].classList.add("filled");
         }
       }
     }
@@ -401,12 +408,9 @@
     function updateNextRoundFromQF() {
       const sfSlots = sfSlotsContainer.querySelectorAll(".slot[data-round='sf']");
       for (let i = 0; i < 4; i++) {
-        const fromMatch = state.qf[i];
-        if (fromMatch) {
-          const slotIndex = i;
-          const slot = sfSlots[slotIndex];
-          slot.textContent = fromMatch;
-          slot.classList.add("filled");
+        if (state.qf[i]) {
+          sfSlots[i].textContent = state.qf[i];
+          sfSlots[i].classList.add("filled");
         }
       }
     }
@@ -414,12 +418,9 @@
     function updateNextRoundFromSF() {
       const finalSlots = finalSlotsContainer.querySelectorAll(".slot[data-round='final']");
       for (let i = 0; i < 2; i++) {
-        const fromMatch = state.sf[i];
-        if (fromMatch) {
-          const slotIndex = i;
-          const slot = finalSlots[slotIndex];
-          slot.textContent = fromMatch;
-          slot.classList.add("filled");
+        if (state.sf[i]) {
+          finalSlots[i].textContent = state.sf[i];
+          finalSlots[i].classList.add("filled");
         }
       }
     }
@@ -462,6 +463,7 @@
     function renderChampion() {
       championBox.innerHTML = "";
       if (!state.champion) return;
+
       const div = document.createElement("div");
       div.className = "champion";
       div.textContent = `🏆 البطل حسب توقعك: ${state.champion}`;
@@ -480,40 +482,38 @@
         slot.textContent = "بانتظار المتأهل...";
         slot.classList.remove("filled");
       });
+
       championBox.innerHTML = "";
     }
 
     function randomFill() {
       resetAll();
-      // دور 16 عشوائي
+
+      // دور 16
       for (let i = 0; i < 8; i++) {
         const matchDiv = matches16Container.children[i];
         const buttons = matchDiv.querySelectorAll(".team-btn");
-        const randomIndex = Math.random() < 0.5 ? 0 : 1;
-        buttons[randomIndex].click();
+        buttons[Math.random() < 0.5 ? 0 : 1].click();
       }
 
-      // ربع النهائي عشوائي
+      // ربع النهائي
       for (let i = 0; i < 4; i++) {
         const matchDiv = qfSlotsContainer.children[i];
         const buttons = matchDiv.querySelectorAll(".team-btn");
-        const randomIndex = Math.random() < 0.5 ? 0 : 1;
-        buttons[randomIndex].click();
+        buttons[Math.random() < 0.5 ? 0 : 1].click();
       }
 
-      // نصف النهائي عشوائي
+      // نصف النهائي
       for (let i = 0; i < 2; i++) {
         const matchDiv = sfSlotsContainer.children[i];
         const buttons = matchDiv.querySelectorAll(".team-btn");
-        const randomIndex = Math.random() < 0.5 ? 0 : 1;
-        buttons[randomIndex].click();
+        buttons[Math.random() < 0.5 ? 0 : 1].click();
       }
 
-      // النهائي عشوائي
+      // النهائي
       const finalMatch = finalSlotsContainer.children[0];
-      const buttons = finalMatch.querySelectorAll(".team-btn");
-      const randomIndex = Math.random() < 0.5 ? 0 : 1;
-      buttons[randomIndex].click();
+      const buttonsFinal = finalMatch.querySelectorAll(".team-btn");
+      buttonsFinal[Math.random() < 0.5 ? 0 : 1].click();
     }
 
     document.getElementById("btnReset").addEventListener("click", resetAll);
