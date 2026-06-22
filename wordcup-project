@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup Predictor</title>
+
+<style>
+/* ================================
+   تصميم الموقع
+================================ */
+
+/* إعادة ضبط */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* الصفحة */
+body {
+  font-family: Arial;
+  background-color: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+/* العنوان */
+h1 {
+  margin-bottom: 20px;
+}
+
+/* المجموعات */
+#groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* كرت المجموعة */
+.group {
+  background-color: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* الجدول */
+table {
+  width: 100%;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #444;
+}
+
+/* عنوان الأعمدة */
+th {
+  color: #22c55e;
+}
+
+/* الأعلام */
+img {
+  width: 25px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚽ دور المجموعات</h1>
+
+<div id="groups"></div>
+
+<script>
+// ================================
+// بيانات المجموعات
+// ================================
+const groups = [
+  {
+    name: "Group A",
+    teams: [
+      { name: "Mexico", code: "mx", points: 0 },
+      { name: "South Africa", code: "za", points: 0 },
+      { name: "South Korea", code: "kr", points: 0 },
+      { name: "Denmark", code: "dk", points: 0 }
+    ]
+  },
+  {
+    name: "Group B",
+    teams: [
+      { name: "Canada", code: "ca", points: 0 },
+      { name: "Qatar", code: "qa", points: 0 },
+      { name: "Spain", code: "es", points: 0 },
+      { name: "Switzerland", code: "ch", points: 0 }
+    ]
+  },
+  {
+    name: "Group C",
+    teams: [
+      { name: "Brazil", code: "br", points: 0 },
+      { name: "Morocco", code: "ma", points: 0 },
+      { name: "Haiti", code: "ht", points: 0 },
+      { name: "Scotland", code: "gb-sct", points: 0 }
+    ]
+  },
+  {
+    name: "Group D",
+    teams: [
+      { name: "USA", code: "us", points: 0 },
+      { name: "Paraguay", code: "py", points: 0 },
+      { name: "Australia", code: "au", points: 0 },
+      { name: "Turkey", code: "tr", points: 0 }
+    ]
+  }
+];
+
+// ================================
+// عرض المجموعات
+// ================================
+const container = document.getElementById("groups");
+
+function renderGroups() {
+
+  container.innerHTML = "";
+
+  groups.forEach(group => {
+
+    const div = document.createElement("div");
+    div.className = "group";
+
+    div.innerHTML = `
+      <h2>${group.name}</h2>
+
+      <table>
+        <tr>
+          <th>الفريق</th>
+          <th>النقاط</th>
+        </tr>
+
+        ${group.teams.map(team => `
+          <tr>
+            <td>
+              <img src="https://flagcdn.com/w40/${team.code}.        ${team.name}
+            </td>
+            <td>${team.points}</td>
+          </tr>
+        `).join("")}
+      </table>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// تشغيل
+renderGroups();
+
+</script>
+
+</body>
+</html>

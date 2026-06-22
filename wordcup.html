@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:white;
+  font-family:Arial;
+}
+
+h1{
+  text-align:center;
+  padding:20px;
+}
+
+#groups{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+.group{
+  background:#1e293b;
+  border-radius:15px;
+  padding:15px;
+}
+
+.match{
+  display:flex;
+  justify-content:space-between;
+  margin:5px 0;
+}
+
+.team{
+  width:35%;
+}
+
+.score{
+  display:flex;
+  gap:5px;
+}
+
+input{
+  width:40px;
+}
+
+table{
+  width:100%;
+  margin-bottom:10px;
+}
+
+button{
+  width:100%;
+  margin-top:10px;
+  background:#22c55e;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>⚽ World Cup</h1>
+<div id="groups"></div>
+
+<script>
+
+const baseGroups = [
+["Mexico","South Africa","South Korea","Czech Republic"],
+["Canada","Qatar","bosnia and herzegovina","Switzerland"],
+["Brazil","Morocco","Haiti","Scotland"],
+["USA","Paraguay","Australia","Turkey"],
+["Germany","Curacao","Ivory Coast","Ecuador"],
+["Netherlands","Japan","Sweden","Tunisia"],
+["Belgium","Egypt","Iran","New Zealand"],
+["Spain","Cape Verde","Saudi Arabia","Uruguay"],
+["France","Senegal","Iraq","Norway"],
+["Argentina","Algeria","Austria","Jordan"],
+["Portugal","Democratic Republic of congo ","Uzbekistan","Colombia"],
+["England","Croatia","Ghana","Panama"]
+];
+
+function createMatches(teams){
+let m=[];
+for(let i=0;i<teams.length;i++){
+for(let j=i+1;j<teams.length;j++){
+m.push({t1:teams[i],t2:teams[j],g1:"",g2:""});
+}}
+return m;
+}
+
+let data=baseGroups.map((t,i)=>({
+name:"Group "+String.fromCharCode(65+i),
+teams:t,
+matches:createMatches(t)
+}));
+
+// ✅ حساب الترتيب
+function calculate(group){
+
+let teams = {};
+
+// تهيئة
+group.teams.forEach(t=>{
+teams[t] = {points:0,goals:0};
+});
+
+// الحساب الصحيح
+group.matches.forEach(m=>{
+
+// ✅ تجاهل المباريات الفارغة
+if(m.g1 === "" || m.g2 === "") return;
+
+let g1 = parseInt(m.g1);
+let g2 = parseInt(m.g2);
+
+// ✅ منع القيم الخاطئة
+if(isNaN(g1) || isNaN(g2)) return;
+if(g1 < 0 || g2 < 0) return;
+
+// ✅ الأهداف (موجبة فقط)
+teams[m.t1].goals += g1;
+teams[m.t2].goals += g2;
+
+// ✅ النقاط
+if(g1 > g2){
+teams[m.t1].points += 3;
+}else if(g2 > g1){
+teams[m.t2].points += 3;
+}else{
+teams[m.t1].points += 1;
+teams[m.t2].points += 1;
+}
+
+});
+
+// تحويل + ترتيب
+let arr = Object.entries(teams).map(([name,val])=>({
+name,
+points:val.points,
+goals:val.goals
+}));
+
+arr.sort((a,b)=>b.points - a.points || b.goals - a.goals);
+
+return arr;
+}
+
+// تحديث
+function update(g,m,t,val){
+
+// ✅ إذا فاضي نخليه ""
+if(val === ""){
+if(t==1) data[g].matches[m].g1="";
+else data[g].matches[m].g2="";
+}else{
+
+val = Math.max(0, parseInt(val)); // منع السالب
+
+if(t==1) data[g].matches[m].g1 = val;
+else data[g].matches[m].g2 = val;
+
+}
+
+render();
+}
+// حفظ
+function save(){
+localStorage.setItem("wc",JSON.stringify(data));
+alert("✅ تم الحفظ");
+}
+
+// عرض
+function render(){
+
+let container=document.getElementById("groups");
+container.innerHTML="";
+
+data.forEach((g,gi)=>{
+
+let table=calculate(g);
+
+let html=`<h2>${g.name}</h2>
+
+<table>
+<tr><th>الفريق</th><th>نقاط</th><th>أهداف</th></tr>
+
+${table.map(t=>`
+<tr>
+<td>${t.name}</td>
+<td>${t.points}</td>
+<td>${t.goals}</td>
+</tr>
+`).join("")}
+</table>
+`;
+
+// المباريات
+g.matches.forEach((m,mi)=>{
+html+=`
+<div class="match">
+<div class="team">${m.t1}</div>
+
+<div class="score">
+<input type="number" value="${m.g1}"
+oninput="update(${gi},${mi},1,this.value)"> -
+<input type="number" value="${m.g2}"
+oninput="update(${gi},${mi},2,this.value)">
+</div>
+
+<div class="team">${m.t2}</div>
+</div>
+`;
+});
+
+
+let div=document.createElement("div");
+div.className="group";
+div.innerHTML=html;
+container.appendChild(div);
+
+});
+
+}
+
+render();
+
+</script>
+
+</body>
+</html> 
